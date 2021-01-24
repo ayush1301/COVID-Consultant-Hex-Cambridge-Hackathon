@@ -1,10 +1,11 @@
 from newspaper import Article
 import nltk
+import pandas as pd
 
 nltk.download('punkt')
 
 url = 'https://www.scmp.com/coronavirus'
-article = Article(url, language="en") # en for English 
+article = Article(url, language="en") # en for English
 '''
 titleList = []
 testList = []
@@ -13,22 +14,23 @@ keyList = []
 '''
 article.download()
 article.parse()
-article.nlp() 
+article.nlp()
 
 print('\n'+ article.title + '\n') #prints the title of the article
 
 '''
-print("Article Text:") 
+print("Article Text:")
 print(article.text) #prints the entire text of the article
-print("\n") 
-print("Article Summary:") 
+print("\n")
+print("Article Summary:")
 print(article.summary) #prints the summary of the article
-print("\n") 
+print("\n")
 print("Article Keywords:")
 print(article.keywords) #prints the keywords of the article
 '''
 
 points = article.summary.split('.')
+print(points)
 
 
 #for point in points:
@@ -51,9 +53,9 @@ from tensorflow.keras.layers import LSTM,Dense,Dropout
 from tensorflow.keras.layers import SpatialDropout1D
 from tensorflow.keras.layers import Embedding
 
-import speech_recognition as sr
+#import speech_recognition as sr
 # Loading model
-reconstructed_model = keras.models.load_model("C:/Users/saura/Documents/ML2021")
+reconstructed_model = keras.models.load_model('./models')
 
 text = "UK MP devastated that coronavirus isn't infecting more people"
 
@@ -74,10 +76,22 @@ tokenizer.fit_on_texts(tweet)
 vocab_size = len(tokenizer.word_index) + 1
 encoded_docs = tokenizer.texts_to_sequences(tweet)
 padded_sequence = pad_sequences(encoded_docs, maxlen=200)
+
+def return_df():
+    return_df = pd.DataFrame(columns=['Heading','Sentiment'])
+
+    for text in points:
+        test_word = text
+        tw = tokenizer.texts_to_sequences([test_word])
+        tw = pad_sequences(tw, maxlen=200)
+        prediction = int(reconstructed_model.predict(tw).round().item())
+        return_df = return_df.append(pd.DataFrame([[text,prediction]],columns=['Heading','Sentiment']))
+        return_df = return_df.replace({'Sentiment': {1:'Negative',0:'Positive'}})
+
+    print(return_df)
+
+    return return_df
+
+
+
 # Model Training
-for text in points:
-    test_word = text
-    tw = tokenizer.texts_to_sequences([test_word])
-    tw = pad_sequences(tw,maxlen=200)
-    prediction = int(reconstructed_model.predict(tw).round().item())
-    print(text, "- Prediction:", sentiment_label[1][prediction])
