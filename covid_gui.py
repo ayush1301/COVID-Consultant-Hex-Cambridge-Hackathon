@@ -61,7 +61,7 @@ class BackEnd(QtCore.QThread):
     update_table_trigger = QtCore.pyqtSignal()
     sort_trigger = QtCore.pyqtSignal(object,object)
 
-    API = 'AIzaSyD_KBYrmy64CaxZdOSm2NdOImUHPU6V-PU'
+    API = '' #Insert API here
     google_api = "https://maps.googleapis.com/maps/api/directions/json?"
 
 
